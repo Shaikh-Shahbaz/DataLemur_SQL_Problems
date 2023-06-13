@@ -1,0 +1,14 @@
+Link - https://datalemur.com/questions/completed-trades
+
+Description -
+------------------------------------
+Write a query to retrieve the top three cities that have the highest number of completed trade orders listed in descending order. Output the city name and the corresponding number of completed trade orders.
+
+Solution -
+------------------------------------
+SELECT city, COUNT(users.user_id) FROM trades
+JOIN users ON trades.user_id = users.user_id
+WHERE status = 'Completed'
+GROUP BY city
+ORDER BY COUNT(users.user_id) DESC
+LIMIT 3;
