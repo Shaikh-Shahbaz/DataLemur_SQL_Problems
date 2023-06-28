@@ -1,0 +1,53 @@
+Link - https://datalemur.com/questions/rolling-average-tweets
+
+Description -
+================================
+
+This is the same question as problem #10 in the SQL Chapter of Ace the Data Science Interview!
+
+Given a table of tweet data over a specified time period, calculate the 3-day rolling average of tweets for each user. Output the user ID, tweet date, and rolling averages rounded to 2 decimal places.
+
+Notes:
+
+A rolling average, also known as a moving average or running mean is a time-series technique that examines trends in data over a specified period of time.
+In this case, we want to determine how the tweet count for each user changes over a 3-day period.
+
+
+Solution (NOT OPTIMAL) -
+================================
+
+WITH tbl1 AS (SELECT user_id, tweet_date, 
+CAST(tweet_count AS DECIMAL) as l1,
+CAST(
+COALESCE(
+LAG(tweet_count, 1) 
+OVER(PARTITION BY user_id ORDER BY tweet_date),0) AS DECIMAL) AS l2,
+CAST(
+COALESCE(
+LAG(tweet_count, 2) 
+OVER(PARTITION BY user_id ORDER BY tweet_date), 0) AS DECIMAL) AS l3
+FROM tweets),
+
+tbl2 AS (
+
+SELECT user_id, tweet_date, l1, l2, l3, 1 as l1_c, 
+CASE WHEN l2 = 0 THEN 0 ELSE 1 END AS l2_c,
+CASE WHEN l3 = 0 THEN 0 ELSE 1 END AS l3_c
+FROM tbl1
+)
+
+
+SELECT user_id, tweet_date, 
+ROUND((l1+l2+l3) / (l1_c + l2_c + l3_c),2) AS rolling_avg_3d 
+FROM tbl2
+
+
+OPTIMAL SOLUTION -
+==================================
+SELECT user_id, tweet_date, 
+ROUND(
+AVG(tweet_count) 
+OVER(PARTITION BY user_id ORDER BY tweet_date 
+ROWS BETWEEN 2 PRECEDING AND CURRENT ROW ), 2) AS tweet_cnt
+FROM tweets
+
