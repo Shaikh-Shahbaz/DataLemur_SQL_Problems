@@ -1,0 +1,18 @@
+Link - https://datalemur.com/questions/frequent-callers
+
+Description - 
+======================================
+UnitedHealth has a program called Advocate4Me, which allows members to call an advocate and receive support for their health care needs – 
+whether that's behavioural, clinical, well-being, health care financing, benefits, claims or pharmacy help.
+Write a query to find how many UHG members made 3 or more calls. case_id column uniquely identifies each call made.
+
+Solution -
+======================================
+WITH tbl1 AS (
+SELECT policy_holder_id, COUNT(DISTINCT case_id) as total_cases
+FROM callers
+GROUP BY policy_holder_id)
+
+SELECT COUNT(policy_holder_id) AS member_count
+FROM tbl1
+WHERE total_cases >= 3
