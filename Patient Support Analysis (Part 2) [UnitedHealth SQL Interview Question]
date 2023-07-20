@@ -1,0 +1,29 @@
+Link - https://datalemur.com/questions/uncategorized-calls-percentage
+
+Description -
+================================
+UnitedHealth Group has a program called Advocate4Me, which allows members to call an advocate and receive support for their health care needs – 
+whether that's behavioural, clinical, well-being, health care financing, benefits, claims or pharmacy help.
+Calls to the Advocate4Me call centre are categorised, but sometimes they can't fit neatly into a category. 
+These uncategorised calls are labelled “n/a”, or are just empty (when a support agent enters nothing into the category field).
+Write a query to find the percentage of calls that cannot be categorised. Round your answer to 1 decimal place.
+
+Solution -
+================================
+WITH tbl1 AS (SELECT
+SUM(
+CASE WHEN call_category = 'n/a' THEN 1
+WHEN call_category IS NULL THEN 1
+ELSE 0 END) AS call_group_na,
+SUM(
+CASE WHEN call_category = 'n/a' THEN 1
+WHEN call_category IS NULL THEN 1
+ELSE 1 END) AS call_group_total
+FROM callers
+)
+
+SELECT 
+ROUND(
+100 *
+CAST(call_group_na AS DECIMAL) / call_group_total,1)
+FROM tbl1
