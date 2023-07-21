@@ -1,0 +1,37 @@
+Link - https://datalemur.com/questions/top-fans-rank
+==============================
+
+Description -
+==============================
+Assume there are three Spotify tables: artists, songs, and global_song_rank, which contain information about the artists, songs, and music charts, respectively.
+
+Write a query to find the top 5 artists whose songs appear most frequently in the Top 10 of the global_song_rank table.
+Display the top 5 artist names in ascending order, along with their song appearance ranking.
+
+Assumptions:
+
+If two or more artists have the same number of song appearances, they should be assigned the same ranking, and the rank numbers should be continuous (i.e. 1, 2, 2, 3, 4, 5).
+For instance, if both Ed Sheeran and Bad Bunny appear in the Top 10 five times, they should both be ranked 1st and the next artist should be ranked 2nd.
+
+Solution -
+===============================
+WITH tbl1 AS (
+SELECT s.song_id, s.artist_id, COUNT(g.song_id) as cnt
+FROM global_song_rank g
+JOIN songs s
+ON g.song_id = s.song_id
+WHERE g.rank <= 10
+GROUP BY s.song_id, s.artist_id
+ORDER BY COUNT(g.song_id) DESC
+),
+
+tbl2 AS (
+SELECT 
+a.artist_name, 
+DENSE_RANK() OVER(ORDER BY SUM(t.cnt) DESC) AS rank
+FROM artists a JOIN tbl1 t
+ON a.artist_id = t.artist_id
+GROUP BY a.artist_name
+)
+
+SELECT * FROM tbl2 WHERE rank < 6
